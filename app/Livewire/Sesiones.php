@@ -9,11 +9,26 @@ class Sesiones extends Component
 {
     public $Modal = false;
     public $monto_inicial;
+    public $sesiones = null;
 
-    public function render()
+    public function mount()
     {
-        return view('livewire.sesiones');
+        // Verificar si existe un registro con status = 0
+        $sesiones = SesionCajaModelo::where('status', 1)->first();
+        
+        // Redirigir a la ruta correspondiente
+        if ($sesiones != null) {
+            return redirect()->to('/cobros');
+        } else {
+            return view('livewire.sesiones');
+        }
     }
+
+
+    //public function render()
+    //{
+    //    return view('livewire.sesiones');
+    //}
 
     public function store()
     {

@@ -31,8 +31,8 @@ class Sesioncaja extends Controller
         //$sesioncaja = SesionCajaModelo::all();
         //$sesioncaja = SesionCajaModelo::where('status', 1)->get();
         $sesioncaja = SesionCajaModelo::where('status', 1)->first();
-        $pagoservicios = PagoServicios::where('contribuyente_id', $id)->get();
-        $totalAPagar = PagoServicios::where('contribuyente_id', $id)->whereNull('deleted_at')->sum('total');
+        $pagoservicios = PagoServicios::where('contribuyente_id', $id)->where('estado', 'Pendiente')->get();
+        $totalAPagar = PagoServicios::where('contribuyente_id', $id)->whereNull('deleted_at')->where('estado', 'Pendiente')->sum('total');
         //$totalAPagar = DB::table('pago_servicios')->where('contribuyente_id', $id)->whereNull('deleted_at')->sum('total');
 
 

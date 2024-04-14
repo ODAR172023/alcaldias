@@ -4,6 +4,7 @@ namespace App\Livewire;
 use App\Models\Contribuyente;
 use App\Models\SesionCaja;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\DB;
 
 use Livewire\Component;
 
@@ -15,34 +16,22 @@ class Cobros extends Component
     public $deleteModal = false;
     public $createModal = false;
     public $monto_inicial;
-    
-    public function store()
+    public $contribuyentes;
+
+    public function mount()
     {
-        $validatedDate = $this->validate([
-            'monto_inicial' => 'required',
-        ]);
-
-        $validatedDate['usuario_id'] = auth()->user()->id;
-        $validatedDate['created_at'] = now();
-        $validatedDate['status'] = 1;
-
-        SesionCaja::create($validatedDate);
-  
-        session()->flash('message', 'Se ha iniciado sesión exitosamente');
-        $this->Modal = false;
-      
+        // Consulta SQL para obtener los contribuyentes con pagos pendientes
+        $this->contribuyentes = DB::table('contribuyentes')
+        ->join('pago_servicios', 'contribuyentes.id', '=', 'pago_servicios.contribuyente_id')
+        ->select('contribuyentes.*')
+        ->where('pago_servicios.estado', 'Pendiente')
+        ->distinct()
+        ->get();
     }
 
     public function render()
     {
-        $contribuyentes = Contribuyente::where(function($query) {
-            $query->where('primer_nombre', 'like', '%'.$this->search.'%')
-            ->orWhere('segundo_nombre', 'like', '%'.$this->search.'%')
-            ->orWhere('primer_apellido', 'like', '%'.$this->search.'%')
-            ->orWhere('segundo_apellido', 'like', '%'.$this->search.'%')
-            ->orWhere('identidad', 'like', '%'.$this->search.'%');
-            })->paginate(5);
-        return view('livewire.cobros.cobros', ['contribuyentes' => $contribuyentes]);
+        return view('livewire.cobros.cobros');
     }
 
     public function openModal()
